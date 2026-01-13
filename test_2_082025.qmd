@@ -1,0 +1,274 @@
+---
+title: "Feature Selection Through Visualization in Biomedical Data Analysis"
+author: "<br><br><span style='font-size:25px;'><strong>Lesley Chapman Hannah, Ph.D., M.S.</strong></span><br>College of Graduate Studies<br>Northeast Ohio Medical University"
+
+format: 
+  revealjs:
+    #theme: solarized
+    css: style.css
+    slide-number: true
+    chalkboard: 
+      buttons: false
+    preview-links: auto
+    logo: images/Flame.jpg
+    #css: styles.css
+    
+---
+
+
+## <span style="font-size:80%">Feature selection: determining which variables matter</span> {.smaller}
+
+- feature selection consists of choosing a subset of the original variables without changing their representation
+- feature selection determines which variables are informative enough to carry biological signal forward in downstream analysis
+- goals of feature selection:
+
+  - improving model performance
+  - reducing overfitting
+  - increasing computational efficiency
+  - preserving interpretability
+
+- feature selection does not alter the original form of the variables unlike dimensionality reduction methods (i.e.: PCA) 
+
+
+<span style="font-size:50%">Bioinformatics 23(19):2507–2517</span>
+
+::: footer
+
+:::
+
+## <span style="font-size:80%">Why feature selection is needed</span> {.smaller}
+
+- High-dimensional biomedical data contain far more features than samples
+- Most features are uninformative or noisy
+- Many features might represent the sample biological phenomena and may appear correlated
+
+Key questions to consider for feature selection:
+
+- Which features vary meaningfully across samples?
+- Are signals global or dominated by a few extremes?
+- Where should thresholds be placed?
+
+<span style="font-size:50%">Bioinformatics 23(19):2507–2517</span>
+
+::: footer
+
+:::
+
+
+## <span style="font-size:80%">Correlated Features</span> {.smaller}
+
+- high-dimensional biomedical and omics data (i.e.: gene expression, pathway scores, proteomics, wearable data): top-ranked features are often highly correlated because they measure the same underlying biological or technical signal
+
+- Consequences of correlated features:
+
+  - inflates model variance
+  - obscures interpretation (multiple features “mean the same thing”)
+  - provides little additional predictive information
+
+::: footer
+
+:::
+
+## <span style="font-size:80%">Correlated Features</span> {.smaller}
+
+::: columns
+::: {.column width="50%"}
+- goal: remove redundant features
+
+- metric used to measure redundancy: Pearson correlation was used as a measure of redundancy
+
+- threshold used for many omics studies: 0.8
+
+- features with > 0.8 are near-interchangeable variables
+
+:::
+
+::: {.column width="50%"}
+![](images/correlation_heatmap_before_pruning.png){.border .border-thick}
+
+:::
+
+:::
+::: footer
+:::
+
+
+## <span style="font-size:80%">Correlated Features</span> {.smaller}
+
+::: columns
+::: {.column width="50%"}
+- given a feature set of omics data (i.e.: RNAseq, DNA sequencing, methylation), determine the features that’re most highly correlated
+- correlation Heatmap correlated feature indicators:
+- **blocks of high correlation** : redundant features driven by shared biology or shared preprocessing steps - could also indicate technical artifacts
+- **isolated features**:  suggest unique signal worth preserving
+
+
+:::
+
+::: {.column width="50%"}
+![](images/correlation_heatmap_before_pruning.png){.border .border-thick}
+
+:::
+
+:::
+::: footer
+:::
+
+
+
+## <span style="font-size:80%">Correlated Features</span> {.smaller}
+
+::: columns
+::: {.column width="50%"}
+- features with scores > 0.8 were dropped
+- remaining feature represents preserve signal while reducing dimensionality and instability
+
+:::
+
+::: {.column width="50%"}
+![](images/correlation_heatmap_after_pruning_adaptive_cutoff.png){.border .border-thick}
+
+:::
+
+:::
+::: footer
+:::
+
+## <span style="font-size:80%">Feature Importance Score</span> {.smaller}
+
+- How much that feature contributed to the model’s behavior, according to the model’s own definition of contribution?
+- model-defined importance score
+- *interpretation*: larger values $\rightarrow$ model relied on this feature more to make a prediction
+
+::: footer
+:::
+
+## <span style="font-size:80%">Feature Importance Score</span> {.smaller}
+
+- In the following simulated example, it can be linked to a model in a number of ways; consider the following model specific examples:
+
+  - total impurity reduction (tree-based models)
+  - total SHAP contribution
+  - total loss reduction
+  - total absolute coefficient weight
+
+::: footer
+
+:::
+
+## <span style="font-size:80%">Feature Importance Score: Example</span> {.smaller}
+
+::: columns
+::: {.column width="50%"}
+- How many of the top-ranked features are needed to account for 80% of the total importance assigned by the model?
+
+Approach
+
+- Display importance scores the model across each feature
+- Rank features from most to least important 
+- Add them up cumulatively
+- Set threshold when 80% of total importance is reached 
+
+:::
+
+::: {.column width="50%"}
+![](images/cumulative_feature_importance_pareto.png){.border .border-thick}
+
+:::
+
+:::
+::: footer
+:::
+
+
+
+## <span style="font-size:80%">Feature importance plot</span> {.smaller}
+
+- plot to determine the genetic and molecular features that drive the model’s ability to distinguish biological states
+- plots can be used to identify the subset of genes dominates the model’s decision process
+- features that have a lower rank are likely to contribute little additional discriminative information beyond higher-ranked genes
+- ranking and pruning features could inform biological follow-up questions (i.e.: downstream pathway analysis) 
+
+
+::: footer
+
+:::
+
+
+
+
+## <span style="font-size:80%">Feature importance plot</span> {.smaller}
+
+::: columns
+::: {.column width="50%"}
+- simulated data example that would represent data from a trained model to predict a biological or clinical outcome [i.e.: disease status, treatment response, molecular subtype]
+- each feature represents a gene whose expression is used by a predictive model (e.g., disease status, subtype, or response)
+
+
+
+:::
+
+::: {.column width="50%"}
+![](images/feature_importance_barplot.png){.border .border-thick}
+
+:::
+
+:::
+::: footer
+:::
+
+## <span style="font-size:80%">Feature importance plot</span> {.smaller}
+
+::: columns
+::: {.column width="50%"}
+- [hypothetical] model  in the previous step [i.e.: LASSO and regularized objective function]  evaluated all genes simultaneously and assigned higher importance to those whose variation most strongly improves discrimination between biological states
+- bar plot displays a ranking of features (genes) by an importance score derived from a fitted classification model
+
+
+
+:::
+
+::: {.column width="50%"}
+![](images/feature_importance_barplot.png){.border .border-thick}
+
+:::
+
+:::
+::: footer
+:::
+
+
+## <span style="font-size:80%">Feature importance plot</span> {.smaller}
+
+::: columns
+::: {.column width="50%"}
+- each bar corresponds to one gene
+- bar length represents the gene’s relative contribution to the model’s predictive performance
+- features are ordered from most important (top) to least important (bottom)
+
+:::
+
+::: {.column width="50%"}
+![](images/feature_importance_barplot.png){.border .border-thick}
+
+:::
+
+:::
+::: footer
+:::
+
+
+
+## <span style="font-size:80%">Summary</span> {.smaller}
+
+- data visualization is an approach that can be used to assist with feature selection in biomedical analysis
+- visual inspection is used to understand feature behavior, structure, and redundancy data prior to downstream analysis
+- visualization reveals which features carry meaningful biological variation
+- plots expose informative signal from noise in biological data by identifying patterns of variability across samples
+
+
+::: footer
+
+:::
+
+
